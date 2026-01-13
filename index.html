@@ -1,5 +1,91 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alameri Digital | لوحة التحكم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #f8fafc; }
+        .stat-card { border-radius: 15px; padding: 15px; color: white; transition: 0.3s; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .nav-link.active { color: #1d4ed8; border-bottom: 3px solid #1d4ed8; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-layer" class="fixed inset-0 bg-[#0f172a] z-[10000] flex items-center justify-center">
+        <div class="bg-white p-10 rounded-[2rem] shadow-2xl w-96 text-center border-t-4 border-blue-600">
+            <div class="text-4xl mb-4">🛡️</div>
+            <h2 class="text-2xl font-black text-gray-800 mb-6">دخول الإدارة</h2>
+            <input id="login-pass" type="password" placeholder="أدخل الرمز (123)" class="w-full p-4 rounded-2xl bg-gray-100 mb-4 outline-none focus:ring-2 focus:ring-blue-500 text-center font-bold">
+            <button onclick="checkAccess()" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-lg shadow-lg hover:bg-blue-700 transition">فتح النظام</button>
+            <p class="mt-4 text-xs text-gray-400">سيتم تفعيل استعادة كلمة السر عبر الإيميل فور ربط Firebase</p>
+        </div>
+    </div>
+
+    <div id="dashboard-body" class="hidden min-h-screen">
+        <header class="bg-white border-b sticky top-0 z-50">
+            <div class="flex justify-between items-center p-4 px-8">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-black text-blue-700">Alameri Digital</h1>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="bg-blue-600 text-white px-5 py-2 rounded-2xl text-sm font-bold shadow-md">رصيد المحفظة: 0.00 ر.س</div>
+                    <button onclick="location.reload()" class="text-red-500 font-bold hover:underline">خروج</button>
+                </div>
+            </div>
+            <div class="flex gap-6 px-8 overflow-x-auto bg-gray-50 border-t py-1">
+                <button onclick="tab('home')" class="nav-link active px-4 py-2 text-sm whitespace-nowrap">نظرة عامة</button>
+                <button onclick="tab('prods')" class="nav-link px-4 py-2 text-sm whitespace-nowrap">المنتجات</button>
+                <button onclick="tab('integrations')" class="nav-link px-4 py-2 text-sm whitespace-nowrap">إضافة ووردبريس</button>
+                <button onclick="tab('payment')" class="nav-link px-4 py-2 text-sm whitespace-nowrap">بوابات الدفع</button>
+                <button onclick="tab('design')" class="nav-link px-4 py-2 text-sm whitespace-nowrap">تعديل التصميم</button>
+            </div>
+        </header>
+
+        <main class="p-6 max-w-7xl mx-auto">
+            
+            <div id="view-home" class="tab-content active">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center font-bold">
+                    <div class="stat-card bg-orange-500">
+                        <p class="text-xs opacity-90">الإيرادات</p>
+                        <h4 class="text-xl">0.00 ر.س</h4>
+                    </div>
+                    <div class="stat-card bg-green-500">
+                        <p class="text-xs opacity-90">الطلبات</p>
+                        <h4 class="text-xl">0</h4>
+                    </div>
+                    <div class="stat-card bg-purple-500">
+                        <p class="text-xs opacity-90">الموزعين</p>
+                        <h4 class="text-xl">0</h4>
+                    </div>
+                    <div class="stat-card bg-blue-500">
+                        <p class="text-xs opacity-90">المستخدمين</p>
+                        <h4 class="text-xl">0</h4>
+                    </div>
+                </div>
+                
+                <div class="bg-white border-2 border-dashed border-gray-200 rounded-[2.5rem] p-16 text-center shadow-sm">
+                    <div class="text-6xl mb-4 text-blue-100">🛒</div>
+                    <h2 class="text-2xl font-black text-gray-800">أنشئ متجرك الأول الآن</h2>
+                    <p class="text-gray-400 mt-2 mb-8">اربط ووردبريس وابدأ في إضافة المنتجات والوصف والأكواد</p>
+                    <button onclick="tab('prods')" class="bg-blue-600 text-white px-10 py-4 rounded-2xl font-black text-lg shadow-xl hover:scale-105 transition">+ إضافة منتجات</button>
+                </div>
+            </div>
+
+            <div id="view-prods" class="tab-content">
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-[2rem] shadow-lg border">
+                    <h3 class="text-xl font-black mb-6 text-blue-700">📦 تفاصيل المنتج الجديد</h3>
+                    <div class="space-y-4">
+                        <input id="p-title" type="text" placeholder="اسم المنتج (مثلاً: شدات ببجي)" class="w-full p-4 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-blue-500">
+                        <textarea id="p-details" placeholder="وصف المنتج..." class="w-full p-4 bg-gray-50 rounded-2xl border-none h-32 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input id="p-cost" type="number" placeholder="السعر $" class="p-4 bg-gray-50 rounded-2xl border-none text-center font
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
     <head>
     <meta charset="UTF-8">
@@ -1211,3 +1297,4 @@ function checkPass() {
     </script>
 </body>
 </html>
+
