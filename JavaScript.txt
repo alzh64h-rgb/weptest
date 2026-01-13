@@ -1,0 +1,14 @@
+function checkPass() {
+    const key = document.getElementById('pass-key').value;
+    // هذا الكود المشفر يمثل كلمة السر "123"
+    // حتى لو شافها أي شخص، لن يعرف الرقم الحقيقي
+    const hashedPass = btoa(key); 
+
+    if(hashedPass === "MTIz") { // "MTIz" هي تشفير لكلمة "123"
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-dashboard').classList.remove('hidden');
+        renderShop();
+    } else {
+        alert("الرمز خطأ!");
+    }
+}
