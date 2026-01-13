@@ -1,0 +1,6 @@
+{
+  "cards": [
+    {"id": 1, "code": "AAAA-BBBB-CCCC", "status": "available", "product_id": "101"},
+    {"id": 2, "code": "DDDD-EEEE-FFFF", "status": "available", "product_id": "102"}
+  ]
+}
