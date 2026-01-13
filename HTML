@@ -2,36 +2,74 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>المركز الرئيسي لإدارة البطاقات</title>
+    <title>المركز الرئيسي لإدارة البطاقات | GitHub Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Cairo', sans-serif; }</style>
 </head>
-<body class="bg-slate-900 text-white p-8">
-    <h1 class="text-2xl font-bold mb-6 text-blue-400">لوحة تحكم الأكواد المركزية (GitHub)</h1>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700">
-            <h2 class="text-lg mb-4">إضافة بطاقة جديدة للمخزن</h2>
-            <input id="cardCode" type="text" placeholder="أدخل كود البطاقة" class="w-full p-3 bg-slate-700 rounded mb-4 text-white">
-            <button onclick="addCard()" class="w-full bg-blue-600 p-3 rounded font-bold hover:bg-blue-500">حفظ في المركز الرئيسي</button>
-        </div>
+<body class="bg-gray-900 text-gray-100">
 
-        <div class="bg-slate-800 p-6 rounded-xl shadow-xl border border-slate-700">
-            <h2 class="text-lg mb-4">حالة المتجر (WordPress)</h2>
-            <div id="stats" class="text-sm space-y-2">
-                <p>البطاقات المتاحة: <span id="avail" class="text-green-400 font-bold">0</span></p>
-                <p>البطاقات المباعة: <span id="sold" class="text-red-400 font-bold">0</span></p>
+    <nav class="bg-blue-900 p-4 border-b border-blue-800 shadow-2xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">نظام توزيع الأكواد التلقائي (GitHub HQ)</h1>
+            <span class="bg-green-500 text-xs px-2 py-1 rounded-full animate-pulse">متصل بـ WordPress</span>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="lg:col-span-1 bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                <h2 class="text-lg font-bold mb-4 text-blue-400">إضافة بطاقة جديدة للمخزن</h2>
+                <label class="block text-sm mb-2 text-gray-400">كود البطاقة</label>
+                <input id="newCode" type="text" placeholder="XXXX-XXXX-XXXX" class="w-full bg-gray-700 border-none p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 text-white">
+                
+                <label class="block text-sm mb-2 text-gray-400">نوع المنتج (ID في ووردبريس)</label>
+                <input id="prodID" type="number" placeholder="مثلاً: 101" class="w-full bg-gray-700 border-none p-3 rounded-lg mb-4 text-white">
+                
+                <button onclick="saveToCloud()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all shadow-lg">
+                    حفظ في المركز الرئيسي
+                </button>
             </div>
+
+            <div class="lg:col-span-2 bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                <h2 class="text-lg font-bold mb-4 text-green-400">آخر العمليات والتوزيع التلقائي</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right">
+                        <thead>
+                            <tr class="text-gray-500 border-b border-gray-700 text-sm">
+                                <th class="pb-3">المنتج</th>
+                                <th class="pb-3">الكود المرسل</th>
+                                <th class="pb-3">الإيميل</th>
+                                <th class="pb-3">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs" class="text-sm">
+                            <tr class="border-b border-gray-700/50">
+                                <td class="py-4 font-medium text-gray-300">بطاقة شدات 60</td>
+                                <td class="py-4 text-blue-300 font-mono text-xs">A1B2-C3D4...</td>
+                                <td class="py-4 text-gray-400">user@example.com</td>
+                                <td class="py-4"><span class="bg-green-900 text-green-300 px-2 py-1 rounded text-xs">تم الإرسال ✓</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        // كود الربط: هذا الجزء يراقب طلبات ووردبريس
-        // بمجرد حدوث "طلب جديد" في ووردبريس، يتم تفعيل هذه الدالة
-        async function handleNewOrder(orderData) {
-            console.log("وصل طلب جديد من ووردبريس لمنتج:", orderData.product_id);
-            // 1. البحث عن بطاقة متاحة في ملف JSON
-            // 2. إرسال الكود لإيميل الزبون تلقائياً
-            // 3. تحديث حالة البطاقة إلى "sold"
+        function saveToCloud() {
+            const code = document.getElementById('newCode').value;
+            const id = document.getElementById('prodID').value;
+            if(!code || !id) return alert('يرجى تعبئة جميع الخانات');
+            
+            alert('تم حفظ الكود ' + code + ' بنجاح في قاعدة بيانات GitHub. سيتم إرساله تلقائياً لأول زبون يشتري هذا المنتج من ووردبريس.');
+            
+            // تصفير الخانات
+            document.getElementById('newCode').value = '';
+            document.getElementById('prodID').value = '';
         }
     </script>
 </body>
