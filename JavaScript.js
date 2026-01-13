@@ -11,4 +11,5 @@ function checkPass() {
     } else {
         alert("الرمز خطأ!");
     }
+
 }
