@@ -3,118 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المركز الرئيسي المتكامل | GitHub HQ</title>
+    <title id="site-title-tag">المركز الرئيسي | إدارة شاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Cairo', sans-serif; }</style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; transition: all 0.3s ease; }
+        .admin-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+    </style>
 </head>
-<body class="bg-[#0f172a] text-white overflow-x-hidden">
+<body class="bg-[#0f172a] text-white">
 
-    <div id="login-screen" class="fixed inset-0 bg-black flex items-center justify-center z-[1000]">
-        <div class="bg-slate-900 p-10 rounded-3xl border-2 border-blue-600 shadow-2xl w-96 text-center">
-            <h2 class="text-2xl font-bold mb-8 text-blue-400">نظام المركز الرئيسي</h2>
-            <input id="pass-key" type="password" placeholder="أدخل رمز الدخول" class="w-full p-4 rounded-xl bg-slate-800 mb-6 border-none focus:ring-2 focus:ring-blue-500 outline-none text-center text-white">
-            <button onclick="checkPass()" class="w-full bg-blue-600 py-4 rounded-xl font-black text-xl hover:bg-blue-500 transition shadow-lg shadow-blue-500/20">دخول النظام</button>
-            <p class="mt-4 text-gray-500 text-xs text-center">الرمز الافتراضي هو 123</p>
+    <div id="login-overlay" class="fixed inset-0 bg-black z-[2000] flex items-center justify-center">
+        <div class="bg-slate-900 p-8 rounded-3xl border border-blue-500 shadow-2xl w-80">
+            <h2 class="text-center mb-6 font-bold text-blue-400 text-lg">دخول المركز الرئيسي</h2>
+            <input id="master-pass" type="password" placeholder="الرمز السري" class="w-full p-3 rounded-xl bg-slate-800 border-none outline-none focus:ring-2 focus:ring-blue-500 text-center mb-4">
+            <button onclick="unlockHQ()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">فتح النظام</button>
         </div>
     </div>
 
-    <div id="main-dashboard" class="hidden min-h-screen flex flex-col">
-        <nav class="p-6 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-lg">
-            <h1 class="text-xl font-black text-blue-400">لوحة التحكم المركزية</h1>
-            <button onclick="location.reload()" class="bg-red-900/40 text-red-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-800 transition">تسجيل خروج</button>
+    <div id="hq-content" class="hidden min-h-screen flex flex-col">
+        <nav id="main-nav" class="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center shadow-xl">
+            <h1 id="brand-name" class="font-black text-xl text-blue-400">متجري الاحترافي</h1>
+            <div class="flex gap-2">
+                <button onclick="showPage('settings-page')" class="bg-slate-800 p-2 rounded-lg text-xs">⚙️ الإعدادات</button>
+                <button onclick="logout()" class="bg-red-900/40 p-2 rounded-lg text-xs text-red-400">خروج</button>
+            </div>
         </nav>
 
-        <div class="flex-1 flex flex-col items-center justify-center gap-8 p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-                
-                <button onclick="showSection('shop-view')" class="bg-gradient-to-br from-blue-600 to-blue-800 p-10 rounded-3xl shadow-2xl hover:scale-105 transition transform text-center group border border-blue-400/30">
-                    <div class="text-6xl mb-4 group-hover:animate-bounce">🛒</div>
-                    <h2 class="text-2xl font-bold">الدخول للمتجر</h2>
-                    <p class="text-sm text-blue-100 mt-2 opacity-70">عرض المنتجات للزبائن</p>
-                </button>
+        <div id="home-page" class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button onclick="showPage('add-product-page')" class="admin-card p-8 rounded-3xl border border-slate-700 hover:border-blue-500 transition text-center">
+                <div class="text-4xl mb-3">📦</div>
+                <h3 class="font-bold">إضافة منتج جديد</h3>
+                <p class="text-xs text-slate-500 mt-2">اسم، وصف، سعر، صورة</p>
+            </button>
+            
+            <button onclick="showPage('inventory-page')" class="admin-card p-8 rounded-3xl border border-slate-700 hover:border-green-500 transition text-center">
+                <div class="text-4xl mb-3">🔑</div>
+                <h3 class="font-bold">مخزن البطاقات</h3>
+                <p class="text-xs text-slate-500 mt-2">ربط الأكواد بالمنتجات</p>
+            </button>
 
-                <button onclick="showSection('admin-view')" class="bg-gradient-to-br from-slate-800 to-slate-700 p-10 rounded-3xl shadow-2xl hover:scale-105 transition transform text-center group border border-slate-600">
-                    <div class="text-6xl mb-4 group-hover:rotate-12">🔑</div>
-                    <h2 class="text-2xl font-bold text-white">إدارة البطاقات</h2>
-                    <p class="text-sm text-slate-400 mt-2 opacity-70">إضافة الأكواد للمخزن</p>
-                </button>
-
-            </div>
+            <button onclick="alert('سيتم فتح نظام التوسعة الجديد قريباً')" class="admin-card p-8 rounded-3xl border border-dashed border-slate-600 hover:border-yellow-500 transition text-center opacity-60">
+                <div class="text-4xl mb-3">➕</div>
+                <h3 class="font-bold">إضافة خيار جديد</h3>
+                <p class="text-xs text-slate-500 mt-2">قريباً: كوبونات، تتبع، تقارير</p>
+            </button>
         </div>
-    </div>
 
-    <div id="shop-view" class="hidden min-h-screen bg-slate-100 text-slate-900">
-        <header class="p-6 bg-white shadow-md flex justify-between items-center sticky top-0 z-50">
-            <button onclick="showSection('main-dashboard')" class="text-blue-600 font-bold hover:bg-blue-50 px-4 py-2 rounded-lg transition">← العودة للوحة</button>
-            <h2 class="text-xl font-black text-slate-800">واجهة المتجر الرئيسية</h2>
-        </header>
-        <div class="container mx-auto p-8 grid grid-cols-1 md:grid-cols-3 gap-8" id="products-list">
+        <div id="add-product-page" class="hidden p-6 max-w-2xl mx-auto w-full">
+            <button onclick="showPage('home-page')" class="mb-4 text-blue-400">← رجوع</button>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                <h2 class="text-xl font-bold mb-6 text-blue-400">تفاصيل المنتج الجديد</h2>
+                <input id="new-p-name" type="text" placeholder="اسم المنتج (مثلاً: شدات ببجي 60)" class="w-full p-3 bg-slate-700 rounded-xl mb-4 border-none">
+                <textarea id="new-p-desc" placeholder="وصف المنتج (مميزات، وقت التسليم...)" class="w-full p-3 bg-slate-700 rounded-xl mb-4 border-none h-24"></textarea>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <input id="new-p-price" type="number" placeholder="السعر" class="p-3 bg-slate-700 rounded-xl border-none text-center">
+                    <input id="new-p-id" type="number" placeholder="ID ووردبريس" class="p-3 bg-slate-700 rounded-xl border-none text-center">
+                </div>
+                <button onclick="saveProduct()" class="w-full bg-blue-600 py-3 rounded-xl font-bold">حفظ المنتج في المتجر</button>
             </div>
-    </div>
-
-    <div id="admin-view" class="hidden min-h-screen p-8 bg-[#0f172a]">
-        <button onclick="showSection('main-dashboard')" class="mb-10 text-blue-400 font-bold hover:text-blue-300 transition block">← العودة للوحة المركزية</button>
-        
-        <div class="max-w-3xl mx-auto bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl">
-            <h2 class="text-2xl font-bold mb-8 text-green-400 flex items-center gap-3">
-                <span class="p-2 bg-green-900/30 rounded-lg">➕</span> إضافة بطاقات جديدة للمخزن
-            </h2>
-            
-            <label class="block text-sm text-gray-400 mb-2 mr-2">رقم المنتج في ووردبريس (ID)</label>
-            <input id="p-id" type="number" placeholder="مثلاً: 125" class="w-full p-4 rounded-xl bg-slate-700 mb-6 border-none outline-none focus:ring-2 focus:ring-green-500 text-white placeholder:text-slate-500">
-            
-            <label class="block text-sm text-gray-400 mb-2 mr-2">الأكواد (كود في كل سطر)</label>
-            <textarea id="p-codes" rows="6" placeholder="XXXX-XXXX-XXXX&#10;YYYY-YYYY-YYYY" class="w-full p-4 rounded-xl bg-slate-700 mb-8 border-none outline-none focus:ring-2 focus:ring-green-500 text-white placeholder:text-slate-500 font-mono"></textarea>
-            
-            <button onclick="alert('تم الحفظ بنجاح في قاعدة بيانات GitHub! أي طلب لهذا المنتج من ووردبريس سيسحب من هذه الأكواد.')" class="w-full bg-green-600 py-5 rounded-2xl font-black text-xl shadow-lg shadow-green-900/20 hover:bg-green-500 transition transform active:scale-95">حفظ البيانات في المركز الرئيسي</button>
         </div>
     </div>
 
     <script>
-        // 1. نظام الدخول والحماية
-        function checkPass() {
-            const key = document.getElementById('pass-key').value;
-            if(key === "123") { // الرمز السري الخاص بك
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('main-dashboard').classList.remove('hidden');
-                renderShop();
+        // نظام الدخول
+        function unlockHQ() {
+            const p = document.getElementById('master-pass').value;
+            if(p === "123") {
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('hq-content').classList.remove('hidden');
+                sessionStorage.setItem('isAdmin', 'true');
             } else {
-                alert("الرمز خطأ! حاول مجدداً");
+                alert("خطأ!");
             }
         }
 
-        // 2. نظام التنقل السلس
-        function showSection(id) {
-            document.getElementById('main-dashboard').classList.add('hidden');
-            document.getElementById('shop-view').classList.add('hidden');
-            document.getElementById('admin-view').classList.add('hidden');
-            const section = document.getElementById(id);
-            section.classList.remove('hidden');
-            window.scrollTo(0,0);
+        // التنقل بين الصفحات
+        function showPage(pageId) {
+            const pages = ['home-page', 'add-product-page'];
+            pages.forEach(p => {
+                const el = document.getElementById(p);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
         }
 
-        // 3. قاعدة بيانات المنتجات (تظهر في المتجر)
-        const products = [
-            {id: 101, name: "بطاقة PUBG 60", price: 1, img: "https://via.placeholder.com/200/1e293b/fff?text=PUBG"},
-            {id: 102, name: "بطاقة iTunes 10$", price: 10, img: "https://via.placeholder.com/200/1e293b/fff?text=iTunes"},
-            {id: 103, name: "بطاقة Google Play 5$", price: 5, img: "https://via.placeholder.com/200/1e293b/fff?text=Google"}
-        ];
+        // حفظ المنتج (مبدئياً)
+        function saveProduct() {
+            const name = document.getElementById('new-p-name').value;
+            if(!name) return alert("دخل اسم المنتج على الأقل!");
+            alert("تم حفظ " + name + " في المركز الرئيسي بنجاح.");
+            showPage('home-page');
+        }
 
-        // 4. دالة عرض المتجر
-        function renderShop() {
-            document.getElementById('products-list').innerHTML = products.map(p => `
-                <div class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-200 hover:shadow-2xl hover:border-blue-500 transition duration-300 transform hover:-translate-y-2">
-                    <div class="bg-slate-100 rounded-2xl p-4 mb-6">
-                        <img src="${p.img}" class="w-full h-40 object-contain mx-auto">
-                    </div>
-                    <h3 class="font-bold text-xl text-slate-800 mb-2">${p.name}</h3>
-                    <div class="flex justify-between items-center mt-6">
-                        <p class="text-blue-600 font-black text-2xl">${p.price} $</p>
-                        <button onclick="alert('سيتم توجيهك لـ ووردبريس للدفع..')" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition shadow-md shadow-blue-200">شراء الآن</button>
-                    </div>
-                </div>
-            `).join('');
+        function logout() {
+            sessionStorage.clear();
+            location.reload();
+        }
+
+        // التحقق من الجلسة عند التحميل
+        if(sessionStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('hq-content').classList.remove('hidden');
         }
     </script>
 </body>
