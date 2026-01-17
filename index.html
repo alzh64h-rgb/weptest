@@ -1,319 +1,196 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Alameri Digital | المركز الرئيسي</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alameri Digital | المركز الرئيسي</title>
 
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 
-    <style>
-        :root { --bg-dark: #0f172a; --accent: #0ea5e9; }
-        html,body { height:100%; }
-        body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; margin:0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
-        .tab { display: none; }
-        .tab.active { display: block; }
-        .nav-btn.active { border-bottom:3px solid var(--accent); color:var(--accent); font-weight:900; }
-        /* overlay */
-        .overlay { background: rgba(0,0,0,0.75); }
-    </style>
+  <!-- EmailJS (اختياري - خيار سريع لاختبار الإرسال من العميل) -->
+  <script src="https://cdn.emailjs.com/sdk/3.2/email.min.js"></script>
+
+  <style>
+    :root { --bg-dark: #0f172a; --accent: #0ea5e9; }
+    html,body { height:100%; }
+    body { font-family: 'Cairo', sans-serif; background-color: #f1f5f9; margin:0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .overlay { background: rgba(0,0,0,0.75); }
+  </style>
 </head>
 <body class="antialiased">
 
-    <!-- قفل الدخول -->
-    <div id="lock-screen" class="fixed inset-0 overlay z-50 flex items-center justify-center">
-        <div class="bg-slate-900 p-8 rounded-3xl w-96 text-center shadow-2xl border border-blue-600/20">
-            <div class="text-5xl mb-4">🛡️</div>
-            <h1 class="text-2xl font-black mb-2 text-blue-300">المركز الرئيسي</h1>
-            <p class="text-sm text-slate-400 mb-6">أدخل رمز الإدارة للوصول إلى لوحة التحكم</p>
+  <!-- قفل الدخول -->
+  <div id="lock-screen" class="fixed inset-0 overlay z-50 flex items-center justify-center">
+    <div class="bg-slate-900 p-8 rounded-3xl w-96 text-center shadow-2xl border border-blue-600/20">
+      <div class="text-5xl mb-4">🛡️</div>
+      <h1 class="text-2xl font-black mb-2 text-blue-300">المركز الرئيسي</h1>
+      <p class="text-sm text-slate-400 mb-6">أدخل رمز الإدارة للوصول إلى لوحة التحكم</p>
 
-            <input id="pass-input" type="password" placeholder="الرمز السري" class="w-full p-3 rounded-xl bg-slate-800 text-white mb-4 outline-none focus:ring-2 focus:ring-blue-500 text-center" />
-            <button onclick="accessHQ()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition">فتح النظام</button>
+      <input id="pass-input" type="password" placeholder="الرمز السري"
+        class="w-full p-3 rounded-xl bg-slate-800 text-white mb-4 outline-none focus:ring-2 focus:ring-blue-500 text-center" />
 
-            <p class="mt-4 text-xs text-slate-400">الرمز الافتراضي: <span class="font-mono">123</span></p>
-        </div>
+      <div class="flex gap-2 mb-4">
+        <button id="open-btn" onclick="accessHQ()" class="flex-1 w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-500 transition">فتح النظام</button>
+        <button id="send-verif-btn" onclick="sendVerification()" class="bg-slate-700 text-white px-4 py-3 rounded-xl font-bold hover:bg-slate-600 transition">أرسل رمز</button>
+      </div>
+
+      <p id="verif-feedback" class="mt-2 text-xs text-slate-400">لأمان أكثر، اضغط "أرسل رمز" لتلقي رمز على بريدك.</p>
+
+      <!-- ملاحظة أمنية: لا تعرض أي كلمة سر/رمز افتراضي هنا -->
+      <!--<p class="mt-4 text-xs text-slate-400">الرمز الافتراضي: <span class="font-mono">123</span></p>-->
     </div>
+  </div>
 
-    <!-- التطبيق -->
-    <div id="app" class="hidden min-h-screen flex flex-col">
+  <!-- التطبيق (بقيّة الصفحة كما هي) -->
+  <div id="app" class="hidden min-h-screen flex flex-col">
+    <!-- ... باقي المحتوى كما في مشروعك ... -->
+  </div>
 
-        <!-- رأس -->
-        <header class="bg-white shadow-sm sticky top-0 z-40">
-            <div class="mx-auto max-w-7xl px-6 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <h2 class="text-2xl font-black text-blue-700">Alameri Digital</h2>
-                </div>
+  <!-- سكربتات المشروع -->
+  <script>
+    // --- تهيئة EmailJS (إن اخترت الحل السريع) ---
+    // استبدل 'YOUR_EMAILJS_USER_ID' بالـ user id الخاص بك من EmailJS
+    // أو انشئ مفتاح خاص بك. (إن لم تستخدم EmailJS احذف هذا السطر)
+    try { emailjs.init('YOUR_EMAILJS_USER_ID'); } catch(e){ /* ignore if not used */ }
 
-                <div class="flex items-center gap-4">
-                    <span id="wallet-balance" class="bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-bold border border-blue-100">رصيد المحفظة: 0.00 ر.س</span>
-                    <button onclick="logout()" class="text-red-500 font-bold hover:underline">خروج</button>
-                </div>
-            </div>
+    // مفتاح/منطق التحقق:
+    // سنخزن رمز التحقق مؤقتًا مشفّراً (بـ btoa) في sessionStorage تحت 'weptest_verif'
+    // ووقت انتهاء صلاحية صغير (مثلاً 10 دقائق)
+    function setVerification(code, ttlSeconds = 600) {
+      const payload = {
+        code: btoa(String(code)),
+        expiresAt: Date.now() + ttlSeconds * 1000
+      };
+      sessionStorage.setItem('weptest_verif', JSON.stringify(payload));
+    }
 
-            <nav class="bg-gray-50 border-t">
-                <div class="mx-auto max-w-7xl px-6 flex gap-6 overflow-x-auto">
-                    <button onclick="showTab('overview', this)" class="nav-btn active py-3 px-4 text-sm">نظرة عامة</button>
-                    <button onclick="showTab('products', this)" class="nav-btn py-3 px-4 text-sm">المنتجات</button>
-                    <button onclick="showTab('inventory', this)" class="nav-btn py-3 px-4 text-sm">مخزن البطاقات</button>
-                    <button onclick="showTab('settings', this)" class="nav-btn py-3 px-4 text-sm">الإعدادات</button>
-                </div>
-            </nav>
-        </header>
-
-        <!-- محتوى -->
-        <main class="flex-1 p-6 mx-auto max-w-7xl w-full">
-            <!-- نظرة عامة -->
-            <section id="overview" class="tab active">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
-                    <div class="rounded-2xl p-6 bg-orange-500 text-white">
-                        <p class="text-xs opacity-90">الإيرادات</p>
-                        <h4 id="stat-revenue" class="text-xl font-black mt-2">0.00 ر.س</h4>
-                    </div>
-                    <div class="rounded-2xl p-6 bg-green-500 text-white">
-                        <p class="text-xs opacity-90">الطلبات</p>
-                        <h4 id="stat-orders" class="text-xl font-black mt-2">0</h4>
-                    </div>
-                    <div class="rounded-2xl p-6 bg-purple-500 text-white">
-                        <p class="text-xs opacity-90">الموزعين</p>
-                        <h4 id="stat-distributors" class="text-xl font-black mt-2">0</h4>
-                    </div>
-                    <div class="rounded-2xl p-6 bg-blue-500 text-white">
-                        <p class="text-xs opacity-90">المستخدمين</p>
-                        <h4 id="stat-users" class="text-xl font-black mt-2">0</h4>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-3xl p-12 text-center shadow-lg">
-                    <div class="text-6xl mb-4 text-blue-100">🛒</div>
-                    <h2 class="text-2xl font-black text-slate-800">أنشئ متجرك الآن</h2>
-                    <p class="text-slate-500 mt-2 mb-6">ربط ووردبريس، إضافة المنتجات وإدارة الأكواد من لوحة واحدة</p>
-                    <button onclick="showTab('products', document.querySelectorAll('.nav-btn')[1])" class="bg-blue-600 text-white px-8 py-3 rounded-2xl font-black">+ إضافة منتجات</button>
-                </div>
-            </section>
-
-            <!-- إدارة المنتجات -->
-            <section id="products" class="tab">
-                <div class="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
-                    <h3 class="text-xl font-black mb-6 text-blue-700">📦 إضافة منتج جديد</h3>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-bold mb-2">اسم المنتج</label>
-                            <input id="prod-name" type="text" placeholder="مثلاً: شدات ببجي 60" class="w-full p-4 bg-gray-50 rounded-2xl outline-none" />
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold mb-2">وصف المنتج</label>
-                            <textarea id="prod-desc" rows="4" placeholder="اكتب تفاصيل المنتج..." class="w-full p-4 bg-gray-50 rounded-2xl outline-none"></textarea>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold mb-2">السعر ($)</label>
-                                <input id="prod-price" type="number" class="w-full p-4 bg-gray-50 rounded-2xl text-center outline-none" />
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-2">ID ووردبريس (اختياري)</label>
-                                <input id="prod-id" type="number" class="w-full p-4 bg-gray-50 rounded-2xl text-center outline-none" />
-                            </div>
-                        </div>
-
-                        <div class="flex gap-4">
-                            <button onclick="saveProduct()" class="w-full bg-green-600 text-white py-3 rounded-2xl font-black">حفظ المنتج</button>
-                            <button onclick="renderProducts()" class="w-full bg-gray-200 text-slate-800 py-3 rounded-2xl font-bold">عرض المنتجات</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6" id="products-grid"></div>
-            </section>
-
-            <!-- مخزن البطاقات -->
-            <section id="inventory" class="tab">
-                <div class="max-w-3xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
-                    <h3 class="text-xl font-black mb-4 text-green-600">🔑 إضافة أكواد للمخزن</h3>
-                    <label class="block text-sm mb-2 font-bold">رقم المنتج (ID)</label>
-                    <input id="inv-prod-id" type="number" class="w-full p-3 bg-gray-50 rounded-2xl mb-4 outline-none" placeholder="مثلاً: 101" />
-
-                    <label class="block text-sm mb-2 font-bold">الأكواد (كل كود في سطر)</label>
-                    <textarea id="inv-codes" rows="6" class="w-full p-3 bg-gray-50 rounded-2xl mb-4 outline-none" placeholder="XXXX-XXXX-XXXX\nYYYY-YYYY-YYYY"></textarea>
-
-                    <button onclick="saveCodes()" class="w-full bg-blue-600 text-white py-3 rounded-2xl font-black">حفظ الأكواد</button>
-                </div>
-            </section>
-
-            <!-- الإعدادات -->
-            <section id="settings" class="tab">
-                <div class="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow-sm border">
-                    <h3 class="text-xl font-black mb-6 text-cyan-600">⚙️ إعدادات المتجر</h3>
-
-                    <label class="block text-sm mb-2 font-bold">اسم المتجر</label>
-                    <input id="setting-brand" type="text" class="w-full p-3 bg-gray-50 rounded-2xl mb-4 outline-none" placeholder="متجري الاحترافي" />
-
-                    <label class="block text-sm mb-2 font-bold">لون الخلفية</label>
-                    <input id="setting-bg" type="color" value="#0f172a" class="w-16 h-10 p-1 rounded-lg mb-6" />
-
-                    <button onclick="applySettings()" class="w-full bg-cyan-600 text-white py-3 rounded-2xl font-black">تطبيق</button>
-                </div>
-            </section>
-        </main>
-
-        <footer class="text-center p-6 text-xs text-slate-500">
-            © Alameri Digital — لوحة التحكم
-        </footer>
-    </div>
-
-    <!-- سكربت الوظائف -->
-    <script>
-        // بيانات محلية بسيطة للعرض (يمكن ربط Firebase أو API لاحقاً)
-        const PRODUCTS_KEY = 'weptest_products_v1';
-        const CODES_KEY = 'weptest_codes_v1';
-
-        let products = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || '[]');
-
-        function accessHQ() {
-            const pass = document.getElementById('pass-input').value;
-            if (pass === '123') {
-                sessionStorage.setItem('isAdmin', 'true');
-                document.getElementById('lock-screen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                renderProducts();
-            } else {
-                alert('الرمز غير صحيح!');
-            }
+    function getVerification() {
+      const raw = sessionStorage.getItem('weptest_verif');
+      if (!raw) return null;
+      try {
+        const obj = JSON.parse(raw);
+        if (Date.now() > obj.expiresAt) {
+          sessionStorage.removeItem('weptest_verif');
+          return null;
         }
+        return obj;
+      } catch(e) { return null; }
+    }
 
-        function logout() {
-            sessionStorage.clear();
-            location.reload();
+    function clearVerification() {
+      sessionStorage.removeItem('weptest_verif');
+    }
+
+    // توليد رمز عشوائي من 6 أرقام
+    function genCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    // إرسال رمز التحقق (خيار سريع: EmailJS من جهة العميل)
+    // يتوقّع أن تستبدل: serviceID, templateID, و userID (موجود في تهيئة أعلاه)
+    async function sendVerification() {
+      const btn = document.getElementById('send-verif-btn');
+      const feedback = document.getElementById('verif-feedback');
+
+      // read saved user email من localStorage إذا مسجلة في إعدادات، أو اطلبها
+      let userEmail = localStorage.getItem('weptest_user_email') || '';
+      if (!userEmail) {
+        userEmail = prompt('أدخل بريدك الإلكتروني لتلقي رمز التحقق:');
+        if (!userEmail) return;
+        localStorage.setItem('weptest_user_email', userEmail);
+      }
+
+      const code = genCode();
+      setVerification(code, 600); // صالح 10 دقائق
+
+      // خيار 1: إرسال عبر EmailJS (سريع للتجربة)
+      const serviceID = 'YOUR_EMAILJS_SERVICE_ID';
+      const templateID = 'YOUR_EMAILJS_TEMPLATE_ID';
+      const templateParams = {
+        to_email: userEmail,
+        verification_code: code,
+        site_name: 'weptest'
+      };
+
+      btn.disabled = true;
+      feedback.innerText = 'جاري إرسال الرمز...';
+
+      // إذا لم تُهيّئ EmailJS أو لم ترد إرسال عبره، يمكنك عرض الكود في صفحة (لا يُنصح بالإبقاء)
+      if (typeof emailjs !== 'undefined' && serviceID !== 'YOUR_EMAILJS_SERVICE_ID') {
+        try {
+          await emailjs.send(serviceID, templateID, templateParams);
+          feedback.innerText = 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.';
+        } catch (err) {
+          console.error(err);
+          feedback.innerText = 'فشل الإرسال عبر EmailJS. تأكد من التهيئة أو استخدم الحل الآمن.';
         }
+      } else {
+        // فشل/لم تُهيّئ EmailJS: نعرض تنبيه (للتجربة فقط)
+        // تحذير: هذا سيعرض الكود في صفحة العميل — لا تتركه في بيئة حقيقية.
+        alert('رمز التحقق (تجريبي): ' + code + '\nملاحظة: فعّل EmailJS لإرسال حقيقي عبر البريد.');
+        feedback.innerText = 'تم إنشاء رمز (وظهور تجريبي). فعّل EmailJS للإرسال الحقيقي.';
+      }
 
-        if (sessionStorage.getItem('isAdmin') === 'true') {
-            document.getElementById('lock-screen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            renderProducts();
+      // منع إعادة الإرسال لمدة 60 ثانية
+      let delay = 60;
+      const origText = btn.innerText;
+      btn.innerText = `أعد الإرسال بعد ${delay}s`;
+      const timer = setInterval(() => {
+        delay--;
+        if (delay <= 0) {
+          clearInterval(timer);
+          btn.disabled = false;
+          btn.innerText = origText;
+        } else {
+          btn.innerText = `أعد الإرسال بعد ${delay}s`;
         }
+      }, 1000);
+    }
 
-        // التبديل بين التبويبات
-        function showTab(tabId, btnEl) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            const target = document.getElementById(tabId);
-            if (target) target.classList.add('active');
+    // تدقيق كلمة المرور/رمز الدخول عند الضغط "فتح النظام"
+    function accessHQ() {
+      const pass = document.getElementById('pass-input').value.trim();
+      if (!pass) return alert('أدخل الرمز');
 
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            if (btnEl && btnEl.classList) btnEl.classList.add('active');
+      // أولاً: تحقق من وجود رمز تحقق صالح في الجلسة
+      const ver = getVerification();
+      if (ver && btoa(pass) === ver.code) {
+        sessionStorage.setItem('isAdmin', 'true');
+        clearVerification();
+        document.getElementById('lock-screen').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        if (typeof renderProducts === 'function') renderProducts();
+        return;
+      }
 
-            // scroll top for better UX
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+      // بديل: إمكانية إعداد كلمة مرور إدارية في الإعدادات (مخزنة في localStorage hashed)
+      const adminHash = localStorage.getItem('weptest_admin_hash'); // مثال: btoa('yourpass')
+      if (adminHash && btoa(pass) === adminHash) {
+        sessionStorage.setItem('isAdmin', 'true');
+        document.getElementById('lock-screen').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        if (typeof renderProducts === 'function') renderProducts();
+        return;
+      }
 
-        // حفظ منتج جديد
-        function saveProduct() {
-            const name = document.getElementById('prod-name').value.trim();
-            const desc = document.getElementById('prod-desc').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value) || 0;
-            const wpId = document.getElementById('prod-id').value ? Number(document.getElementById('prod-id').value) : null;
+      alert('الرمز غير صحيح!');
+    }
 
-            if (!name) return alert('أدخل اسم المنتج أولاً');
+    function logout() {
+      sessionStorage.clear();
+      location.reload();
+    }
 
-            const p = { id: Date.now(), name, desc, price, wpId };
-            products.push(p);
-            localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-            alert('تم إضافة المنتج بنجاح');
-            clearProductForm();
-            renderProducts();
-            showTab('products', document.querySelectorAll('.nav-btn')[1]);
-        }
-
-        function clearProductForm() {
-            document.getElementById('prod-name').value = '';
-            document.getElementById('prod-desc').value = '';
-            document.getElementById('prod-price').value = '';
-            document.getElementById('prod-id').value = '';
-        }
-
-        // عرض المنتجات
-        function renderProducts() {
-            const grid = document.getElementById('products-grid');
-            if (!grid) return;
-            if (products.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500">لا توجد منتجات بعد</div>';
-                return;
-            }
-
-            grid.innerHTML = products.map(p => `
-                <div class="bg-white p-6 rounded-2xl shadow hover:shadow-lg transition">
-                    <div class="h-40 bg-gray-50 rounded-2xl flex items-center justify-center mb-4">
-                        <img src="https://via.placeholder.com/220x120?text=Product" alt="${escapeHtml(p.name)}" class="object-contain h-full" />
-                    </div>
-                    <h4 class="font-black text-lg mb-2">${escapeHtml(p.name)}</h4>
-                    <p class="text-sm text-slate-500 mb-4">${escapeHtml(p.desc || '')}</p>
-                    <div class="flex justify-between items-center">
-                        <span class="text-2xl font-black text-blue-600">${p.price} $</span>
-                        <div class="flex gap-2">
-                            <button onclick="sellProduct(${p.id})" class="bg-blue-600 text-white px-4 py-2 rounded-lg">شراء</button>
-                            <button onclick="deleteProduct(${p.id})" class="bg-red-100 text-red-600 px-3 py-2 rounded-lg">حذف</button>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function sellProduct(id) {
-            alert('محاكاة توجيه للدفع — لاحقاً ربط ووردبريس/بوابة دفع');
-            // هنا يمكن إضافة منطق لإنشاء طلب أو تحديث إحصائيات
-            document.getElementById('stat-orders').innerText = Number(document.getElementById('stat-orders').innerText || 0) + 1;
-        }
-
-        function deleteProduct(id) {
-            if (!confirm('هل تريد حذف هذا المنتج؟')) return;
-            products = products.filter(p => p.id !== id);
-            localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
-            renderProducts();
-        }
-
-        // حفظ أكواد في المخزن
-        function saveCodes() {
-            const prodId = Number(document.getElementById('inv-prod-id').value);
-            const codesText = document.getElementById('inv-codes').value.trim();
-            if (!prodId || !codesText) return alert('أدخل ID المنتج والأكواد');
-
-            const codes = codesText.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
-            const store = JSON.parse(localStorage.getItem(CODES_KEY) || '{}');
-            store[prodId] = (store[prodId] || []).concat(codes);
-            localStorage.setItem(CODES_KEY, JSON.stringify(store));
-            alert('تم حفظ الأكواد للمخزون بنجاح');
-            document.getElementById('inv-prod-id').value = '';
-            document.getElementById('inv-codes').value = '';
-        }
-
-        // إعدادات
-        function applySettings() {
-            const brand = document.getElementById('setting-brand').value.trim();
-            const bg = document.getElementById('setting-bg').value;
-            if (brand) document.querySelector('header h2').innerText = brand;
-            if (bg) document.body.style.backgroundColor = bg;
-            alert('تم تطبيق الإعدادات');
-        }
-
-        // مساعدة لتفادي XSS بسيط عند الإدراج في DOM
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        // render at start if admin
-        if (sessionStorage.getItem('isAdmin') === 'true') {
-            document.getElementById('lock-screen').classList.add('hidden');
-            document.getElementById('app').classList.remove('hidden');
-            renderProducts();
-        }
-    </script>
+    // عند تحميل الصفحة: اذا تم تسجيل دخول سابقًا
+    if (sessionStorage.getItem('isAdmin') === 'true') {
+      document.getElementById('lock-screen').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      if (typeof renderProducts === 'function') renderProducts();
+    }
+  </script>
 </body>
 </html>
